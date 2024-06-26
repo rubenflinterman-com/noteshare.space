@@ -9,7 +9,10 @@ on:
     branches: [ "main" ]
 
 jobs:
-  Publish:
+  test:
+    name: Run tests
+    uses: rubenflinterman-com/noteshare.space/.github/workflows/test.yaml@master
+  publish:
     runs-on: buildjet-4vcpu-ubuntu-2204-arm
     permissions:
       contents: read
