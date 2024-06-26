@@ -2,17 +2,19 @@ name: Publish to GHCR
 
 on: 
   push:
-    branches: [ "main" ]
+    branches: [master]
     # Publish semver tags as releases. 
     tags: [ 'v*.*.*' ]
   pull_request:
-    branches: [ "main" ]
+    branches: [master]
 
 jobs:
   test:
     name: Run tests
     uses: rubenflinterman-com/noteshare.space/.github/workflows/test.yaml@master
   publish:
+    name: Publish
+    needs: [test]
     runs-on: buildjet-4vcpu-ubuntu-2204-arm
     permissions:
       contents: read
