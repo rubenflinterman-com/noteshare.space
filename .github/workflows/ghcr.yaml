@@ -70,7 +70,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./server/prisma
-          file: Dockerfile
+          file: ./server/prisma/Dockerfile
           platforms: linux/arm64/v8
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/migrate:latest
@@ -80,7 +80,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./server
-          file: Dockerfile
+          file: ./server/prisma/Dockerfile
           platforms: linux/arm64/v8
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/backend:latest
@@ -90,7 +90,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./webapp
-          file: Dockerfile
+          file: ./webapp/Dockerfile
           platforms: linux/arm64/v8
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend:latest
