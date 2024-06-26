@@ -1,0 +1,64 @@
+name: Publish to GHCR
+
+on: workflow_dispatch
+
+jobs:
+  Publish:
+    runs-on: buildjet-4vcpu-ubuntu-2204-arm
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        env:
+          REGISTRY: ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.CI_GHCR_PAT }}
+
+      - name: Extract metadata for Docker GHCR
+        env:
+          REGISTRY: ghcr.io
+          IMAGE_NAME: ${{ github.repository }}
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/migrate
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/backend
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend
+
+      - name: Build and push Docker image for migrate
+        uses: docker/build-push-action@v5
+        with:
+          context: ./server/prisma
+          file: Dockerfile
+          platforms: linux/arm64/v8
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/migrate:latest
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Build and push Docker image for backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./server
+          file: Dockerfile
+          platforms: linux/arm64/v8
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/backend:latest
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Build and push Docker image for frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./webapp
+          file: Dockerfile
+          platforms: linux/arm64/v8
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend:latest
+          labels: ${{ steps.meta.outputs.labels }}
